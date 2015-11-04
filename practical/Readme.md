@@ -1,6 +1,7 @@
 Practical Report
 ===
-Practical component to accompanying report-style paper exploring load balancing in the containerised cloud ecosystem.
+Practical component to accompanying report-style paper exploring container cluster
+management frameworks.
 
 Development
 ---

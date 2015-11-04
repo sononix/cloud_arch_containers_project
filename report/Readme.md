@@ -1,6 +1,6 @@
 Project Report
 ===
-Conference report-style paper exploring load balancing in the containerised cloud ecosystem.
+Conference report-style paper exploring container cluster management frameworks.
 
 Development
 ---
