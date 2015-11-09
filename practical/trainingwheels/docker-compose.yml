@@ -1,0 +1,28 @@
+www:
+  #build: www
+  image: magrossi/trainingwheels
+  expose:
+    - "5000"
+  links:
+    - redis
+  user: nobody
+  mem_limit: 200000000
+  #environment:
+  #  DEBUG: 1
+  #command: python counter.py
+  #volumes:
+  #  - ./www:/src
+
+redis:
+  image: redis
+  mem_limit: 50000000
+
+lb:
+  image: tutum/haproxy
+  links:
+   - www
+  ports:
+   - "80:80"
+  environment:
+   - BACKEND_PORT=5000
+   - BALANCE=roundrobin

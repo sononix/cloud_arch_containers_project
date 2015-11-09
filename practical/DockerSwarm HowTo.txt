@@ -1,0 +1,21 @@
+1. Download and install Docker Toolbox
+   https://www.docker.com/docker-toolbox
+
+2. Follow Get Started tutorial here to create a Swarm:
+   https://docs.docker.com/swarm/install-w-machine/
+   - After this is done you should have at least 3 VMs created:
+     . 1 x Swarm Master
+     . 2 x Swarm Agents
+
+3. Check your swarm environment (you should see all nodes here):
+   docker info
+
+3. Direct the swarm by issuing command:
+   eval $(docker-machine env --swarm swarm-master)
+
+4. Go to the directory where you put the docker-compose.yml file and:
+   docker-compose up -d (to start silently)
+   docker-compose scale www=4 (or other number higher than 1)
+
+5. See the containers running (here you should see them spreading on your nodes, in my case they are created always on the same one):
+   docker ps
