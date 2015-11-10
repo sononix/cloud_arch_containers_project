@@ -15,7 +15,7 @@
      \raise.07ex\hbox{\scriptsize R}\hfil\crcr\mathhexbox20D}}}
 
 
-\title{A Comparative Study on Container Cluster Management Frameworks}
+\title{Dockerised Clouds: \\ A Comparative Study on Container Cluster Management Frameworks}
 
 \makeatletter
 \def\name#1{\gdef\@name{#1\\}}
@@ -29,14 +29,35 @@ Dublin 9, Ireland\\
 }
 
 
-
-
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-\lipsum[1]
+Containerisation is a recently resurged computing paradigm 
+that is having a significant impact on how applications are being built, 
+shipped and ran.\ Along with being less resource intensive and 
+more portable, containers simplify dependency 
+management, application versioning and service scaling, as opposed 
+to deploying applications or application components directly 
+onto a host operating system. Docker, albeit a relatively young project, 
+has successfully established a container standard  
+in Linux and poses itself as being production-ready. 
+\par
+Being interoperable in nature, container instances can be easily scaled
+on a single host or across a cluster of hosts.
+Increasingly, cluster management frameworks are providing 
+first-class support for the Docker container standard and runtime. 
+This includes established solutions such as Apache Mesos 
+and Kubernetes.\ Docker now also includes its own native clustering
+ tool, Swarm.
+This paper reviews the current approaches and patterns forwarded by 
+cluster management solutions to orchestrate and choreograph 
+distributed container clusters under Docker. Subsequently, this paper
+contributes a comparative analysis of two varying 
+frameworks in this space,  Kubernetes and Swarm.
+
+
 \end{abstract}
 
 \section{Introduction}
