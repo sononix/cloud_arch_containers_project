@@ -15,8 +15,7 @@
      \raise.07ex\hbox{\scriptsize R}\hfil\crcr\mathhexbox20D}}}
 
 
-\title{A Comparative Study on Load Balancing in Containerised Clouds: Foo vs Bar}
-\name{John E. Speaker Jr.}
+\title{Dockerised Clouds: \\ A Comparative Study on Container Cluster Management Frameworks}
 
 \makeatletter
 \def\name#1{\gdef\@name{#1\\}}
@@ -30,22 +29,89 @@ Dublin 9, Ireland\\
 }
 
 
-
-
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-\lipsum[1]
+Containerisation is a recently resurged computing paradigm 
+that is having a significant impact on how applications are being built, 
+shipped and ran.\ Being interoperable in nature, container instances can be easily scaled
+on a single host or across a cluster of hosts.\
+Docker, albeit a relatively young project, 
+has successfully established a container standard  
+in Linux and poses itself as being production-ready.\ 
+Increasingly, cluster management frameworks are providing 
+first-class support for the Docker container standard and runtime. 
+This includes established solutions such as Apache Mesos 
+and Kubernetes.\ Docker now also includes its own native clustering
+ tool, Swarm.
+This paper considers Docker's production-readiness with respect
+to native clustering capabilities and runtime interoperability.\
+We review the current approaches and patterns forwarded by 
+cluster management solutions to orchestrate distributed container clusters under Docker,\
+and subsequently contribute a comparative analysis of two varying 
+frameworks in this space,  Kubernetes and Swarm.
+
+
 \end{abstract}
 
 \section{Introduction}
-Example citation \citep{db}. \lipsum[1]
+Containers have a long history in computing though much of their recent popularity 
+surround the recent developments of both LXC and the Docker platform. 
+The former can be described as a container execution environment,
+or more formally, a Linux user space interface to 
+access new kernel capabilities of achieving process isolation through namespaces
+and cgroups \citep{Claus}. The latter is an open-source suite of tools managed by Docker Inc.\ which
+extends upon container technology such as LXC, in turn 
+allowing containers to behave like ``full-blown hosts in their own right" 
+whereby containers have ``strong isolation, their own network and storage stacks, as well 
+as resource management capabilities to allow friendly co-existence of multiple containers on a host" \citep{db}.
+\par 
+Uncertainties around Docker's maturity and production-readiness have been expressed \citep{Kereki, Powers, Merkel}, however 
+over the last two years the states of both Docker and the containerisation ecosystem continue to rapidly progress.\
+Last year Docker has seen an unprecedented increase in development, adoption and community uptake \citep{Merkel}. Most
+notably was the introduction of customisable container execution environments. This means as opposed to LXC one can
+``take advantage of the numerous isolation tools available" such as ``OpenVZ, systemd-nspawn, libvirt-sandbox, qemu/kvm, BSD Jails and Solaris Zones".
+Also included in this 0.9 release was the new built-in container execution driver ``libcontainer", which replaced LXC as the default driver.
+Going forward on all platforms Docker can now execute kernel features such as ``namespaces, control groups, capabilities, apparmor profiles, 
+network interfaces and firewalling rules" predictably ``without depending on LXC" as an external dependency \citep{Hykes}. 
+\par
+Interestingly, libcontainer itself was the first project to provide a standard interface for making containers and managing their lifecycle.\
+Subsequently the Docker CEO  announced the coming together of industry leaders and others in partnership with the Linux Foundation
+to form a ``minimalist, non-profit, openly governed project" named The Open Container Initiative (OCI), with the purpose of defining 
+``common specifications around container format and runtime" \citep{Golub}. 
+Thereafter Docker donated its base container format and runtime, libcontainer, to be maintained by the OCI. 
+\par
+Amidst establishing a container standard, Docker has made significant headway in 
+supporting multi-host cloud production environments. In terms of native tooling, in the last year Docker has implemented
+a suite of tools for provisioning and orchestrating containers:
+\begin{itemize}
+\item \textbf{Docker Machine} allows one to provision Docker hosts, which are simply Linux virtual machines (VMs) supporting Docker, on a local machine or cloud. 
+Its pluggable driver API currently supports ``provisioning Docker locally with Virtualbox as well as remotely" on cloud providers such Digital Ocean, AWS, Azure and VMware.
+\item \textbf{Docker Swarm} is a clustering solution which takes the standard 
+``Docker Engine and extends it to enable you to work on a cluster of containers". 
+This in turn allows one to ``manage a resource pool of Docker hosts and schedule
+containers to run transparently on top, automatically managing workload and providing failover services".
+\item \textbf{Docker Compose} is the ``glue" allowing one to compose a multi-host application on top of a Swarm cluster whereby you
+can specify how each application is to be ran in the the cluster, in turn allowing one to orchestrate and choreograph local or cloud containers.
+\end{itemize}
+\noindent In many cases an existing cloud infrastructure depends upon one or more orchestration tools, for example 
+Consul for service discovery. Typically, such tools cannot be migrated away from easily and in turn cause ``vendor lock-in".
+Consequently, Docker have implemented this trio of orchestration tools in a generic way, 
+providing ``a standard interface to service providers so that they can almost be used as plug-and-play solutions" on top of the Docker platform \citep{holla}.
+\par
+Backed by both the industry and community, Docker is now presented as a more mature and production-ready
+platform, however it should be mentioned that there yet exists no
+formal topology for a fully, or partly, Dockerised cloud \citep{Claus}. In 
+turn, there is no widely accepted solution for managing distributed 
+Docker-based clusters.\ This is unsurprising given that 
+practitioners and industry experts have noted that frameworks in this space
+vary greatly in terms of capability, architecture and target cluster proportion
+\citep{goasguen, holla}.
+\par
+This paper presents TODO. The remainder of this paper is structured as follows. TODO
 
-
-\section{Related work}
-\lipsum[1]
 
 \section{Study Design}
 \lipsum[1]
@@ -57,7 +123,7 @@ Example citation \citep{db}. \lipsum[1]
 \lipsum[1]
 
 \subsubsection{Todo - Another title}
-\lipsum[1] 
+\lipsum[1]
 
 
 \section{Discussion}
