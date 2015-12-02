@@ -34,81 +34,81 @@ Dublin 9, Ireland\\
 \maketitle
 
 \begin{abstract}
-Containerisation is a recently resurged computing paradigm 
-that is having a significant impact on how applications are being built, 
+Containerisation is a recently resurged computing paradigm
+that is having a significant impact on how applications are being built,
 shipped and ran.\ Being interoperable in nature, container instances can be easily scaled
 on a single host or across a cluster of hosts.\
-Docker, albeit a relatively young project, 
-has successfully established a container standard  
-in Linux and poses itself as being production-ready.\ 
-Increasingly, cluster management frameworks are providing 
-first-class support for the Docker container standard and runtime. 
-This includes established solutions such as Apache Mesos 
+Docker, albeit a relatively young project,
+has successfully established a container standard
+in Linux and poses itself as being production-ready.\
+Increasingly, cluster management frameworks are providing
+first-class support for the Docker container standard and runtime.
+This includes established solutions such as Apache Mesos
 and Kubernetes.\ Docker now also includes its own native clustering
  tool, Swarm.
 This paper considers Docker's production-readiness with respect
 to native clustering capabilities and runtime interoperability.\
-We review the current approaches and patterns forwarded by 
+We review the current approaches and patterns forwarded by
 cluster management solutions to orchestrate distributed container clusters under Docker,\
-and subsequently contribute a comparative analysis of two varying 
+and subsequently contribute a comparative analysis of two varying
 frameworks in this space, Kubernetes and Swarm.
 
 
 \end{abstract}
 
 \section{Introduction}
-Containers have a long history in computing though much of their recent popularity 
-surround the recent developments of both LXC and the Docker platform. 
+Containers have a long history in computing though much of their recent popularity
+surround the recent developments of both LXC and the Docker platform.
 The former can be described as a container execution environment,
-or more formally, a Linux user space interface to 
+or more formally, a Linux user space interface to
 access new kernel capabilities of achieving process isolation through namespaces
 and cgroups \citep{Claus}. The latter is an open-source suite of tools managed by Docker Inc.\ which
-extends upon container technology such as LXC, in turn 
-allowing containers to behave like ``full-blown hosts in their own right" 
-whereby containers have ``strong isolation, their own network and storage stacks, as well 
+extends upon container technology such as LXC, in turn
+allowing containers to behave like ``full-blown hosts in their own right"
+whereby containers have ``strong isolation, their own network and storage stacks, as well
 as resource management capabilities to allow friendly co-existence of multiple containers on a host" \citep{db}.
-\par 
-Uncertainties around Docker's maturity and production-readiness have been expressed \citep{Kereki, Powers, Merkel}, however 
+\par
+Uncertainties around Docker's maturity and production-readiness have been expressed \citep{Kereki, Powers, Merkel}, however
 over the last two years the states of both Docker and the containerisation ecosystem continue to rapidly progress.\
 Last year Docker has seen an unprecedented increase in development, adoption and community uptake \citep{Merkel}. Most
 notably was the introduction of customisable container execution environments. This means as opposed to LXC one can
 ``take advantage of the numerous isolation tools available" such as ``OpenVZ, systemd-nspawn, libvirt-sandbox, qemu/kvm, BSD Jails and Solaris Zones".
 Also included in this 0.9 release was the new built-in container execution driver ``libcontainer", which replaced LXC as the default driver.
-Going forward on all platforms Docker can now execute kernel features such as ``namespaces, control groups, capabilities, apparmor profiles, 
-network interfaces and firewalling rules" predictably ``without depending on LXC" as an external dependency \citep{Hykes}. 
+Going forward on all platforms Docker can now execute kernel features such as ``namespaces, control groups, capabilities, apparmor profiles,
+network interfaces and firewalling rules" predictably ``without depending on LXC" as an external dependency \citep{Hykes}.
 \par
 Interestingly, libcontainer itself was the first project to provide a standard interface for making containers and managing their lifecycle.\
 Subsequently the Docker CEO  announced the coming together of industry leaders and others in partnership with the Linux Foundation
-to form a ``minimalist, non-profit, openly governed project" named The Open Container Initiative (OCI), with the purpose of defining 
-``common specifications around container format and runtime" \citep{Golub}. 
-Thereafter Docker donated its base container format and runtime, libcontainer, to be maintained by the OCI. 
+to form a ``minimalist, non-profit, openly governed project" named The Open Container Initiative (OCI), with the purpose of defining
+``common specifications around container format and runtime" \citep{Golub}.
+Thereafter Docker donated its base container format and runtime, libcontainer, to be maintained by the OCI.
 \par
-Amidst establishing a container standard, Docker has made significant headway in 
+Amidst establishing a container standard, Docker has made significant headway in
 supporting multi-host cloud production environments. In terms of native tooling, in the last year Docker has implemented
 a suite of tools for provisioning and orchestrating containers:
 \begin{itemize}
-\item \textbf{Docker Machine} allows one to provision Docker hosts, which are simply Linux virtual machines (VMs) supporting Docker, on a local machine or cloud. 
+\item \textbf{Docker Machine} allows one to provision Docker hosts, which are simply Linux virtual machines (VMs) supporting Docker, on a local machine or cloud.
 Its pluggable driver API currently supports ``provisioning Docker locally with Virtualbox as well as remotely" on cloud providers such Digital Ocean, AWS, Azure and VMware.
-\item \textbf{Docker Swarm} is a clustering solution which takes the standard 
-``Docker Engine and extends it to enable you to work on a cluster of containers". 
+\item \textbf{Docker Swarm} is a clustering solution which takes the standard
+``Docker Engine and extends it to enable you to work on a cluster of containers".
 This in turn allows one to ``manage a resource pool of Docker hosts and schedule
 containers to run transparently on top, automatically managing workload and providing fail-over services", whereby you can specify how each container is to be ran in the the cluster, in turn allowing one to orchestrate and choreograph local or cloud containers.
 \item \textbf{Docker Compose} is the ``glue" allowing one to configure relationships between containers (called links) and define within a single configuration file a full container based application and it's interdependencies, along with resource needs (like memory or disk).
 \end{itemize}
-\noindent In many cases an existing cloud infrastructure depends upon one or more orchestration tools, for example 
+\noindent In many cases an existing cloud infrastructure depends upon one or more orchestration tools, for example
 Consul for service discovery. Typically, such tools cannot be migrated away from easily and in turn cause ``vendor lock-in".
-Consequently, Docker have implemented this trio of orchestration tools in a generic way, 
+Consequently, Docker have implemented this trio of orchestration tools in a generic way,
 providing ``a standard interface to service providers so that they can almost be used as plug-and-play solutions" on top of the Docker platform \citep{holla}.
 \par
 Backed by both the industry and community, Docker is now presented as a more mature and production-ready
 platform. Notwithstanding this impressive growth, there yet exists no
 formal topology for a fully, or partly, Dockerised cloud \citep{Claus}.\ Similarly,
-so for there is no widely accepted solution for managing 
+so for there is no widely accepted solution for managing
 Docker container clusters.\
  This paper considers how primary cluster management activities are achievable on top of the Docker platform.
-In doing so we review the interoperability of the Docker runtime and format with existing 
+In doing so we review the interoperability of the Docker runtime and format with existing
 container management solutions. Subsequently, we forward a comparative study
-on two contrasting solutions, Kubernetes and Docker Swarm. 
+on two contrasting solutions, Kubernetes and Docker Swarm.
 \par
 The remainder of this paper is structured as follows. In
 section two we overview service orchestration, discovery and configuration in Docker clusters. Following this, section three and four detail our
@@ -118,14 +118,14 @@ reviews of Docker Swarm and Kubernetes respectively. Finally, in section five we
 \section{Docker Cluster Management}
 Practitioners and industry experts note that cluster management tooling supporting Docker
 vary greatly in terms of capability, architecture and target cluster proportion
-\citep{goasguen, holla}. This is unsurprising when we consider that all infrastructures 
+\citep{goasguen, holla}. This is unsurprising when we consider that all infrastructures
 are not subject to same orchestration requirements and software release cycles.
 For instance, slow moving infrastructures can be characterised as having infrequent application deployments,
- hard-coded service configurations and rare service failures which may not have an urgent impact. In contrast, more fast moving infrastructures feature continuous deployments and strong automation in terms of service configuration and recovery. 
+ hard-coded service configurations and rare service failures which may not have an urgent impact. In contrast, more fast moving infrastructures feature continuous deployments and strong automation in terms of service configuration and recovery.
  % maybe add more of an intro here
 
 \subsection{Service orchestration}
-Central to cloud cluster management is the ability to elastically provision and tear down clusters. Many cloud providers have introduced their own service orchestration tools such as CloudFormation from AWS and Heat by OpenStack \citep{Dudouet}. 
+Central to cloud cluster management is the ability to elastically provision and tear down clusters. Many cloud providers have introduced their own service orchestration tools such as CloudFormation from AWS and Heat by OpenStack \citep{Dudouet}.
 On a high-level, these tools simply define a cluster template which can be later orchestrated with possibly extended configurations. As previously mentioned, the native Docker orchestration tools support similar features that can clusterise multi-host containers. Docker Compose conceptually defines a similar template to that of Amazon's CloudFormation and allows one to perform orchestration tasks such as provisioning, destroying and scaling on per container basis.
 \par
 \citet{Claus} describe container-based clusters as consisting of several hosts which are ``virtual servers on hypervisors or possibly bare-metal servers", each of which typically runs several containers that are responsible for scheduling, load balancing and serving an application or service. Meaning containers can be distributed across one or more host machines wherein these hosts might be virtual servers running other services that must also be orchestrated.
@@ -142,17 +142,17 @@ a single pool of resources" and can provide similar cluster management facilitie
 Service discovery and configuration management are central cluster management concepts in distributed systems and microservices-based architectures. Both of which are argued to overlap in nature. Service discovery can be described as an approach to achieve ``dynamic and automatic software system composition, configuration and adaptation" \citep{Yang}. Generally, service discovery implementations accomplish this by allowing application components/services discover information or configurations about their current and  neighbouring environments through a distributed key-value store.
 \par
 Whether operating under a fast or slow moving infrastructure, requiring a service discovery solution is generally related to having a service-orientated  architecture style. The more distributed a system becomes, the more regularly do services require information about their own and neighbouring environments. The tooling around service discovery ranges in terms of complexity and provided features. DNS (Domain Name Systems) is a well-known and commonly understood standard which allows us ``associate a name with the IP address of one or machines" where the name becomes an ``entry point to the IP address of the host running that service" \citep{Newman}. More advanced tools like Consul and Apache Zookeeper                                                                                             support both configuration management and service discovery. The former is designed specifically for service discovery and can use service health checking features to route traffic away from unhealthy nodes. The later is used for wider variety of cases such ``configuration management, synchronizing data between services, leader election, message queues and as a naming service" \citep{Newman}.
-\par 
-Container-based service discovery involves the ability to dynamically register and discover multi-host containers among their peers. \citet{holla} poses two techniques to accomplish discovery in Docker; integrating Swarm backend discovery tools or using default Docker features like names and links. Docker Swarm implements a hosted discovery service which uses generated tokens to discover cluster nodes. Being primarily concerned with orchestration, Swarm does not currently support dynamic service registration and configuration. However, to dynamically configure and manage the services in your containers one can use a discovery backend with Swarm such as Etcd, Consul or Zookeeper. 
+\par
+Container-based service discovery involves the ability to dynamically register and discover multi-host containers among their peers. \citet{holla} poses two techniques to accomplish discovery in Docker; integrating Swarm backend discovery tools or using default Docker features like names and links. Docker Swarm implements a hosted discovery service which uses generated tokens to discover cluster nodes. Being primarily concerned with orchestration, Swarm does not currently support dynamic service registration and configuration. However, to dynamically configure and manage the services in your containers one can use a discovery backend with Swarm such as Etcd, Consul or Zookeeper.
 \par
 As previously highlighted, Docker Compose provides a mechanism to link named containers on the same host. This is accomplished by ``inserting the first container's IP address in /etc/hosts when starting the second container". Importantly, the IP address of a container living on a different host ``is not known by the docker daemon running in the current host". The ambassador container pattern achieves cross-host container linking between provider and consumer containers by dynamically configuring network connections through respective intermediate ambassador containers \citep{holla}.
 
 \section{Study: Docker Swarm}
 Now included as part of the Docker platform, Swarm is Docker's production-ready cluster management tool. It allows for the transparent scaling of containers across multiple hosts and as it serves the Docker daemon API it can be used seamlessly on top of any Docker supported tools (like Docker Compose, Dokky, Jenkins and others).
-Swarm will run an agent daemon in each node of the cluster and coordinate them using a pluggable discovery service back-end (which maintains a list of nodes in your cluster) and a swarm manager (that will actually control the whole cluster). 
+Swarm will run an agent daemon in each node of the cluster and coordinate them using a pluggable discovery service back-end (which maintains a list of nodes in your cluster) and a swarm manager (that will actually control the whole cluster).
 \par
-The connection between the manager and agent nodes is made through a secure tcp connection (by means of TSL certificates). 
-In previous versions of Swarm, the manager itself was the single point of failure of the cluster as there was no fail-over available. 
+The connection between the manager and agent nodes is made through a secure tcp connection (by means of TSL certificates).
+In previous versions of Swarm, the manager itself was the single point of failure of the cluster as there was no fail-over available.
 In the latest release, version 1.0, a replication service for the manager has been developed whereby several manager instances will compete for leadership, making Swarm a highly available solution.
 \subsection{Networking}
 Making use of the new networking feature of Docker (as of version 1.9), the whole cluster is interconnected by a virtual network that can be manually configured to connect any nodes in private/global scopes. The overlay network driver is used by default which results in all nodes of a cluster to be on the same virtual network (and so able to intercommunicate out-of-the-box). This is a very powerful feature for multi-host configuration that is now supported natively by Docker.
@@ -177,9 +177,56 @@ To support more complex scheduling mechanism Swarm also provides filtering to ef
 As of version 1.0, Swarm does not yet support host rebalancing - where a host fails and needs to be rescheduled on another node. Nevertheless, this is noted on the project roadmap and is destined to be released alongside Docker the 1.10 release \citep{Vieux}.
 
 \section{Study: Kubernetes}
+
+
+Kubernetes
+\par
+Like Docker, Kubernetes is an open source solution for orchestration management and a monitoring tool for large computation clusters. Kubernetes is built by the same team of engineers who developed the Google compute platform and extends on the experience those engineers have from managing and tooling internal clusters. Kubernetes is a scheduler similar to Mesos[http://mesos.apache.org/], a resource scheduler which is used for monitoring and automated deployment.
+\par
+In order for a cluster to operate optimally individually processing units need to be able to communicate efficiently with each other. This is a rather difficult problem to solve for very large clusters. Kubernetes is a system for creating, running and most importantly managing distributed infrastructure. The framework allows for a granular approach to configuring a high availability cluster. At the heart of Kubernetes ethos are etcd and its internal scheduler which binds unscheduled pods to nodes via a binding API.
+\par
+Everything in Kubernetes is declarative within its own inner API definition. This definition is maintained by calling from kube-apiserver service. A Kubernetes cluster consists of a master and a node enity. Master components are responsible for making global decisions about a cluster including scheduling, detecting and responding to cluster events. Multiple nodes or minions may be assigned to a master. Etcd runs on each master/minion in a cluster and gracefully handles master election during network partitions and the loss of the current master. Natively etcd can recover from hardware failures and this is one of the key features that is driving Kubernetes market penetration. Other platforms are harnessing the power of open source etcd, including Cloudfoundry[https://www.cloudfoundry.org/], Fleet[https://www.fleetio.com/] and Deis[http://deis.io/] infrastructure. Etcd forms the conical hub for the creation and management of distributed tasks via services and replication controllers. Pods are a native entity within the Kubernetes hierarchy ecosystem, similar to containers. Containers and pods can be considered one of the same where pods inherent a refined manifest to the management of it life cycle within a live cluster.  Lets consider the terminology used within a Kubernetes environment.
+
+Pods
+\par
+Pods form the basic build entity within a Kubernetes cluster. A pod may contain a heterogeneous mix of containers that collectively communicate together to maintain an application or the structure of the pod may also be singular in nature but all pods mimic a shared network interface. This results in a uniform interface across all pods connected to the cluster. Containers within the same pod communicate on a local host protocol and communication via external pods is carried out though a proxy interface via network services. This allows for highly effective access to pods and different containers in the same pod and prevents pods from using the same network ports. Pods once initialize will never be moved. If a Pod is lost or removed a new pod is created via the replication controller to follow the manifest of optimum resources laid down in that file.
+
+Replication Controllers
+\par
+While monitoring the integrity of a live cluster replication controllers may be called upon to manage the infrastructure of the application depending on the manifest. Replication Controllers serve as a template manifest to the dynamic allocate resources that are available to the cluster and the initial creation and monitoring of these resources is maintain via replication controller yaml file.  Using this file you can specify the number of replicas that you want a pod to have. If there are too many pods the status quo will be restore the the amount of pods defined using the –replica tag. The same will hold if there are too few and more pods shall be created.  The replication controller maintains the desired number of pods matches its label selector are operational.
+
+
+Labels
+\par
+Labels are in effect a naming convention that are assigned to pods for management of the computation resources. This naming schema may be used to roll out a testing/development application or a full production implementation depending on the use case. Labeling gives clients the ability to easily access the current resources that are available scaling up or down as the need requires.
+Unlike a naming convection using ID’s, labels do not provide uniqueness, many objects can contain the same label but kubernetes labels define a taxonomy of resources that are available.
+
+
+Network Services
+\par
+Network services provide the communication of not just pods but the communication between clusters. Communication within a Kubernetes cluster happens through a rigorous API that is accessed via the kubectl tool and kube-proxy. On node initialize kubectl is placed on every node while kube-proxy facilitates a kubernetes service abstraction by maintaining network rules on the host and performing connection forwarding. Kubelet manages pods their children, their images and their volumes.
+\par
+These are the basic primitives the form the building block of a kubernetes cluster. Services on a node include docker, kubelet and network proxy
+
+\par
+MHH MAY NEED TO EXTEND THIS
+
+
+
+
+
+
+
+
+
+
 \lipsum[1]
 
 \section{Conclusions}
+\parseint
+Swarm provides a tightly coupled integration for docker based containers used in orchestration. If creating a small number of containers this would appear to the be the best implementation path. While Kubernetes is feature rich, complexity and understanding of it internal operations are key in garnering the most from the framework. While Kubernetes is complex the overriding factor for auto deployment and self-healing, for orchestration of micro-services in a way that you are not bounded to docker/swarm, Kubernetes provides a viable alternative.
+\par
+NEED to ADD MORE
 \lipsum[1]
 
 
